@@ -1,0 +1,13 @@
+Source: locopdf
+Section: media
+Maintainer: Alexander Kerner <lunohod@openinkpot.org>
+XCS-Cross-Host-Build-Depends: debhelper (>> 2.0.0), cdbs-slind
+XCS-Cross-Build-Depends: libevas-dev, libecore-dev, libedje-dev, libepdf-dev, libsqlite3-dev
+Priority: optional
+Standards-Version: 3.6.2
+
+Package: locopdf
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: PDF reader based on EPDF and Evas
+ PDF reader based on EPDF and Evas
