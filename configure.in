@@ -13,4 +13,4 @@ PKG_CHECK_MODULES(EDJE,[edje])
 PKG_CHECK_MODULES(EPDF, [epdf])
 PKG_CHECK_MODULES(SQLITE, [sqlite3])
 
-AC_OUTPUT(Makefile src/Makefile)
+AC_OUTPUT(Makefile src/Makefile themes/Makefile)
