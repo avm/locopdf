@@ -1,4 +1,3 @@
-Makefile.am
 Makefile.in
 config.log
 config.sub
