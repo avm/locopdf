@@ -1,3 +1,9 @@
+locopdf (0.1-4) asimov; urgency=low
+
+  * Fixed dependencies
+
+ -- Alexander Kerner <lunohod@openinkpot.org>  Wed, 18 Mar 2009 11:17:44 +0100
+
 locopdf (0.1-3) unstable; urgency=low
 
   * improvements
