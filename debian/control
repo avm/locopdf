@@ -1,8 +1,8 @@
 Source: locopdf
 Section: media
 Maintainer: Alexander Kerner <lunohod@openinkpot.org>
-XCS-Cross-Host-Build-Depends: debhelper (>> 2.0.0), cdbs-slind
-XCS-Cross-Build-Depends: libevas-dev, libecore-dev, libedje-dev, libepdf-dev, libsqlite3-dev
+XCS-Cross-Host-Build-Depends: debhelper (>> 2.0.0), cdbs, cdbs-embedded, autoconf, automake, libtool, pkg-config
+XCS-Cross-Build-Depends: libevas-dev, libecore-dev, libedje-dev, libepdf-dev, libsqlite3-dev, libpoppler-dev
 Priority: optional
 Standards-Version: 3.6.2
 
