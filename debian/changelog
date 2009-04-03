@@ -1,3 +1,9 @@
+locopdf (0.1-4+b1) asimov; urgency=low
+
+  * Rebuild with new toolchain.
+
+ -- Alexander Kerner <lunohod@openinkpot.org>  Fri, 03 Apr 2009 17:36:28 +0200
+
 locopdf (0.1-4) asimov; urgency=low
 
   * Fixed dependencies
