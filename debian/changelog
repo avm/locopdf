@@ -1,3 +1,9 @@
+locopdf (0.1-5) UNRELEASED; urgency=low
+
+  * Added locopdf.desktop
+
+ -- Mikhail Gusarov <dottedmag@dottedmag.net>  Tue, 25 Aug 2009 02:47:45 +0700
+
 locopdf (0.1-4+b2) asimov; urgency=low
 
   * Rebuild due to EFL update
