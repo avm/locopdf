@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=LocoPDF
+GenericName=PDF viewer
+Exec=locopdf %F
+Type=Application
+Categories=Office;Viewer;Literature;
+MimeType=application/pdf
