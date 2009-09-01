@@ -277,6 +277,21 @@ void render_cur_page()
     //fprintf(stderr,"\nwidth=%d,height=%d,ltrim=%d,rtrim=%d,ttrim=%d,btrim=%d,fwzoom=%f,fhzoom=%f\n",width,height,lefttrim,righttrim,toptrim,bottomtrim,fitwidthzoom,fitheightzoom);
 }
 
+Evas_Object *find_active_pdfobj()
+{
+    if(curpdfobj==1)
+        return evas_object_name_find(evas,"pdfobj1");
+    else
+        return evas_object_name_find(evas,"pdfobj2");
+}
+Evas_Object *find_inactive_pdfobj()
+{
+    if(curpdfobj==1)
+        return evas_object_name_find(evas,"pdfobj2");
+    else
+        return evas_object_name_find(evas,"pdfobj1");
+}
+
 void *thread_func(void *vptr_args)
 {
     if(curpage>=(numpages-1))
@@ -284,11 +299,7 @@ void *thread_func(void *vptr_args)
 
     pthread_mutex_lock(&pdf_renderer_mutex);
 
-    Evas_Object *pdfobj;
-    if(curpdfobj==1)
-        pdfobj=evas_object_name_find(evas,"pdfobj2");
-    else
-        pdfobj=evas_object_name_find(evas,"pdfobj1");
+    Evas_Object *pdfobj = find_inactive_pdfobj();
     epdf_page_page_set(page,curpage+1);
     int width,height;
     epdf_page_size_get (page, &width, &height);
@@ -362,11 +373,7 @@ int are_legal_coords(int x1,int y1,int x2,int y2)
 
 void pan_cur_page(int panx,int pany)
 {
-    Evas_Object *pdfobj;
-    if(curpdfobj==1)
-        pdfobj=evas_object_name_find(evas,"pdfobj1");
-    else
-        pdfobj=evas_object_name_find(evas,"pdfobj2"); 
+    Evas_Object *pdfobj = find_active_pdfobj();
     int x,y,w,h;
     evas_object_geometry_get(pdfobj,&x,&y,&w,&h);
     
@@ -377,20 +384,12 @@ void pan_cur_page(int panx,int pany)
 
 void reset_cur_panning()
 {
-    Evas_Object *pdfobj;
-    if(curpdfobj==1)
-        pdfobj=evas_object_name_find(evas,"pdfobj1");
-    else
-        pdfobj=evas_object_name_find(evas,"pdfobj2"); 
+    Evas_Object *pdfobj = find_active_pdfobj();
     evas_object_move (pdfobj,0,0);    
 }
 void reset_next_panning()
 {
-    Evas_Object *pdfobj;
-    if(curpdfobj==1)
-        pdfobj=evas_object_name_find(evas,"pdfobj2");
-    else
-        pdfobj=evas_object_name_find(evas,"pdfobj1"); 
+    Evas_Object *pdfobj = find_inactive_pdfobj();
     evas_object_move (pdfobj,0,0);    
 }
 
@@ -411,19 +410,14 @@ void prerender_next_page()
 
 void flip_pages()
 {
-    Evas_Object *active,*inactive;
+    Evas_Object *active = find_active_pdfobj();
+    Evas_Object *inactive = find_inactive_pdfobj();
+
     if(curpdfobj==1)
-    {
-        active=evas_object_name_find(evas,"pdfobj1");
-        inactive=evas_object_name_find(evas,"pdfobj2");
         curpdfobj=2;
-    }
     else
-    {
-        active=evas_object_name_find(evas,"pdfobj2");
-        inactive=evas_object_name_find(evas,"pdfobj1");
         curpdfobj=1;
-    }
+
     evas_object_hide(active);
     evas_object_show(inactive);
 }
@@ -470,11 +464,7 @@ void main_ok(Evas *e, Evas_Object *obj)
 
 void main_plus(Evas *e, Evas_Object *obj)
 {
-    Evas_Object *pdfobj;
-    if(curpdfobj==1)
-        pdfobj=evas_object_name_find(evas,"pdfobj1");
-    else
-        pdfobj=evas_object_name_find(evas,"pdfobj2"); 
+    Evas_Object *pdfobj = find_active_pdfobj();
     int x,y,w,h;
     evas_object_geometry_get(pdfobj,&x,&y,&w,&h);
     int new_w=ROUND(((double)w)*(zoom+zoominc)/zoom);
@@ -490,11 +480,7 @@ void main_minus(Evas *e, Evas_Object *obj)
 {
     if((zoom-zoominc)>0)
     {
-        Evas_Object *pdfobj;
-        if(curpdfobj==1)
-            pdfobj=evas_object_name_find(evas,"pdfobj1");
-        else
-            pdfobj=evas_object_name_find(evas,"pdfobj2"); 
+        Evas_Object *pdfobj = find_active_pdfobj();
         int x,y,w,h;
         evas_object_geometry_get(pdfobj,&x,&y,&w,&h);
         int new_w=ROUND(((double)w)*(zoom-zoominc)/zoom);
@@ -527,12 +513,8 @@ void main_nav_right(Evas *e, Evas_Object *obj)
 {
     if(readermode)
     {
-        Evas_Object *pdfobj;
+        Evas_Object *pdfobj = find_active_pdfobj();
         int pan_amt=(-1)*ROUND(((double)get_win_height())*vpaninc);
-        if(curpdfobj==1)
-            pdfobj=evas_object_name_find(evas,"pdfobj1");
-        else
-            pdfobj=evas_object_name_find(evas,"pdfobj2"); 
         int x,y,w,h;
         evas_object_geometry_get(pdfobj,&x,&y,&w,&h);
     
@@ -602,12 +584,8 @@ void main_item(Evas *e, Evas_Object *obj,int index, bool lp)
     {
         if(readermode)
         {
-            Evas_Object *pdfobj;
+            Evas_Object *pdfobj = find_active_pdfobj();
             int pan_amt=(-1)*ROUND(((double)get_win_height())*vpaninc);
-            if(curpdfobj==1)
-                pdfobj=evas_object_name_find(evas,"pdfobj1");
-            else
-                pdfobj=evas_object_name_find(evas,"pdfobj2"); 
             int x,y,w,h;
             evas_object_geometry_get(pdfobj,&x,&y,&w,&h);
     
@@ -821,11 +799,7 @@ int main(int argc, char *argv[])
     if(dbres!=(-1))
     {
         save_global_settings(argv[1]);
-        Evas_Object *pdfobj;
-        if(curpdfobj==1)
-            pdfobj=evas_object_name_find(evas,"pdfobj1");
-        else
-            pdfobj=evas_object_name_find(evas,"pdfobj2"); 
+        Evas_Object *pdfobj = find_active_pdfobj();
         int x,y,w,h;
         evas_object_geometry_get(pdfobj,&x,&y,&w,&h);
         set_setting_INT(argv[1],"current_x",x);
