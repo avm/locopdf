@@ -247,24 +247,20 @@ void render_cur_page()
             scalex=fitheightzoom;
             scaley=fitheightzoom;
         }
-        
     }
     else if(fitmode==FIT_STRETCH)
     {
         scalex=fitwidthzoom;
         scaley=fitheightzoom;
-    
     }
     else if(fitmode==FIT_NO)
     {
         scalex=1.0;
         scaley=1.0;
-        
     }
     
     epdf_page_scale_set (page,scalex,scaley);
-    //epdf_page_scale_set (page,1.0,1.0);
-    //epdf_page_scale_set(page,zoom,zoom);
+
     if(!lefttrim && !righttrim && !toptrim && !bottomtrim)
     {
         epdf_page_render (page,pdfobj);
@@ -280,6 +276,7 @@ void render_cur_page()
 
     //fprintf(stderr,"\nwidth=%d,height=%d,ltrim=%d,rtrim=%d,ttrim=%d,btrim=%d,fwzoom=%f,fhzoom=%f\n",width,height,lefttrim,righttrim,toptrim,bottomtrim,fitwidthzoom,fitheightzoom);
 }
+
 void *thread_func(void *vptr_args)
 {
     if(curpage>=(numpages-1))
@@ -295,7 +292,7 @@ void *thread_func(void *vptr_args)
     epdf_page_page_set(page,curpage+1);
     int width,height;
     epdf_page_size_get (page, &width, &height);
-    //epdf_page_scale_set (page,((double)get_win_width())/((double)width)*zoom,((double)get_win_height())/((double)height)*zoom);
+
     double fitwidthzoom=((double)get_win_width())/((double)(width-lefttrim-righttrim))*zoom;
     double fitheightzoom=((double)get_win_height())/((double)(height-toptrim-bottomtrim))*zoom;
     
@@ -324,24 +321,19 @@ void *thread_func(void *vptr_args)
             scalex=fitheightzoom;
             scaley=fitheightzoom;
         }
-        
     }
     else if(fitmode==FIT_STRETCH)
     {
         scalex=fitwidthzoom;
         scaley=fitheightzoom;
-    
     }
     else if(fitmode==FIT_NO)
     {
         scalex=1.0;
         scaley=1.0;
-        
     }
     
     epdf_page_scale_set (page,scalex,scaley);
-    //epdf_page_scale_set (page,1.0,1.0);
-    //epdf_page_scale_set(page,zoom,zoom);
     if(!lefttrim && !righttrim && !toptrim && !bottomtrim)
     {
         epdf_page_render (page,pdfobj);
@@ -349,16 +341,13 @@ void *thread_func(void *vptr_args)
     else
     {
         epdf_page_render_slice (page,pdfobj,(int)(((double)lefttrim)*scalex),(int)(((double)toptrim)*scaley),(int)(((double)(width-lefttrim-righttrim))*scalex),(int)(((double)(height-toptrim-bottomtrim))*scaley));
-                             
-        
     }
-    //prerendering=0;
 
     pthread_mutex_unlock(&pdf_renderer_mutex);
 
     return NULL;
-
 }
+
 int are_legal_coords(int x1,int y1,int x2,int y2)
 {
     
@@ -369,9 +358,8 @@ int are_legal_coords(int x1,int y1,int x2,int y2)
     if((ys_in_range && xs_in_range) || (ys_in_range&& xs_opposite) || (xs_in_range && ys_opposite) || (xs_opposite && ys_opposite))
         return 1;
     return 0;
-    
-    
 }
+
 void pan_cur_page(int panx,int pany)
 {
     Evas_Object *pdfobj;
@@ -405,12 +393,12 @@ void reset_next_panning()
         pdfobj=evas_object_name_find(evas,"pdfobj1"); 
     evas_object_move (pdfobj,0,0);    
 }
+
 void ensure_thread_dead()
 {
     if(prerendering)
         pthread_join(thread, NULL);
     prerendering=0;
-
 }
 
 void prerender_next_page()
@@ -439,6 +427,7 @@ void flip_pages()
     evas_object_hide(active);
     evas_object_show(inactive);
 }
+
 void next_page()
 {
     if(curpage>=(numpages-1))
@@ -568,60 +557,46 @@ void main_nav_menubtn(Evas *e, Evas_Object *obj)
     
     
 }
+
 void main_item(Evas *e, Evas_Object *obj,int index, bool lp)
 {
-    //int paninc=5;
     if(index==1)
     {
-        
-        
         Evas_Object *bgobj=evas_object_name_find(evas,"background");
         GotoPageEntry(evas,bgobj);  
     }
     else if(index==2)
     {
-       
-        
         pan_cur_page(0,ROUND(((double)get_win_height())*vpaninc));
     }
     else if(index==3)
     {
-        
         if(pdf_index)
             TOCDialog(e,obj,pdf_index);
     }
     else if(index==4)
     {
         
-        
     }
     else if(index==5)
     {
         //reset_cur_panning();
-        
     }
     else if(index==6)
     {
-          
-        
         pan_cur_page(ROUND(((double)get_win_width())*hpaninc),0);
     }
     else if(index==7)
     {
-        
-        
         pan_cur_page(0,(-1)*ROUND(((double)get_win_height())*vpaninc));
     }
     else if(index==8)
     {
-        
-        
         pan_cur_page((-1)*ROUND(((double)get_win_width())*hpaninc),0);
     }
     else if(index==9)
     {
         prev_page();    
-        
     }
     else if(index==0)
     {
@@ -716,7 +691,6 @@ void restore_global_settings(char *filename)
     if(temp11==0 || temp11==1)
     {
         readermode=temp11;    
-        
     }
     temp11=get_setting_INT(filename,"fit_mode");
     if(temp11>=0)
@@ -873,6 +847,4 @@ int main(int argc, char *argv[])
     ecore_evas_shutdown();
     ecore_shutdown();
     evas_shutdown();
-
-
 }
