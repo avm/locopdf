@@ -731,6 +731,11 @@ int main(int argc, char *argv[])
     
     Evas_Object *bg,*o1,*o2;
 
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s file.pdf\n", argv[0]);
+        exit(1);
+    }
+
     /* initialize our libraries */
     evas_init();
     ecore_init();
