@@ -224,8 +224,10 @@ cache_item *find_unused_obj()
 {
     struct cache_item *item = cache;
     for(int i = 0; i < cache_size; i++, item++) {
-        if(!item->displayed)
+        if(!item->displayed) {
+            fprintf(stderr, "using slot %d\n", i);
             return item;
+        }
     }
     return NULL;
 }
@@ -240,6 +242,7 @@ void *thread_func(void *vptr_args)
             pthread_cond_wait(&pdf_page_event, &pdf_renderer_mutex);
         // Right now prediction is valid and the page_event has fired.
         // Looks like we have to render the page
+        fprintf(stderr, "gonna render %d\n", prediction);
 
         cache_item *item = find_unused_obj();
         assert(item != NULL);
@@ -264,8 +267,10 @@ void undisplay_image(Evas_Object *image)
 {
     pthread_mutex_lock(&pdf_renderer_mutex);
     for(int i = 0; i < cache_size; i++) {
-        if(cache[i].obj == image)
+        if(cache[i].obj == image) {
+            fprintf(stderr, "undisplaying image at slot %d\n", i);
             cache[i].displayed = 0;
+        }
     }
     pthread_mutex_unlock(&pdf_renderer_mutex);
 }
@@ -406,12 +411,14 @@ static void request_page_synch(int page)
     if(prediction != page && !try_find_slot_synch(page)) {
         prediction = page;
         pthread_cond_signal(&pdf_page_event);
+        fprintf(stderr, "requested page %d\n", page);
     }
 }
 
 
 void show_cur_page()
 {
+    fprintf(stderr, "trying to show page %d\n", curpage);
     Evas_Object *newimage = find_image_for_page(curpage);
 
     if(newimage == active_image)
@@ -805,3 +812,4 @@ int main(int argc, char *argv[])
     ecore_shutdown();
     evas_shutdown();
 }
+// vim:set et sw=4:
