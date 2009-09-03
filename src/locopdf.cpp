@@ -220,7 +220,7 @@ static struct cache_item {
 /* prediction for the next page. */
 static int prediction = INVALID_PAGE;
 
-cache_item *find_unused_obj()
+static cache_item *find_unused_obj()
 {
     struct cache_item *item = cache;
     for(int i = 0; i < cache_size; i++, item++) {
@@ -234,7 +234,7 @@ cache_item *find_unused_obj()
 
 static void render_page(int page, Evas_Object *obj);
 
-void *thread_func(void *vptr_args)
+static void *thread_func(void *vptr_args)
 {
     while(1) {
         pthread_mutex_lock(&pdf_renderer_mutex);
@@ -263,7 +263,7 @@ void *thread_func(void *vptr_args)
     }
 }
 
-void undisplay_image(Evas_Object *image)
+static void undisplay_image(Evas_Object *image)
 {
     pthread_mutex_lock(&pdf_renderer_mutex);
     for(int i = 0; i < cache_size; i++) {
@@ -275,7 +275,7 @@ void undisplay_image(Evas_Object *image)
     pthread_mutex_unlock(&pdf_renderer_mutex);
 }
 
-cache_item *try_find_slot_synch(int page)
+static cache_item *try_find_slot_synch(int page)
 {
     for(int i = 0; i < cache_size; i++) {
         if(cache[i].page == page)
@@ -286,7 +286,7 @@ cache_item *try_find_slot_synch(int page)
 
 static void request_page_synch(int page);
 
-Evas_Object *find_image_for_page(int page)
+static Evas_Object *find_image_for_page(int page)
 {
     cache_item *ret;
     pthread_mutex_lock(&pdf_renderer_mutex);
@@ -362,7 +362,7 @@ static void render_page(int curpage, Evas_Object *pdfobj)
     }
 }
 
-void image_cache_init()
+static void image_cache_init()
 {
     for(int i = 0; i < cache_size; i++) {
         cache_item *item = cache + i;
@@ -385,7 +385,7 @@ int are_legal_coords(int x1,int y1,int x2,int y2)
     return 0;
 }
 
-void pan_cur_page(int panx,int pany)
+static void pan_cur_page(int panx,int pany)
 {
     int x,y,w,h;
     evas_object_geometry_get(active_image,&x,&y,&w,&h);
@@ -399,7 +399,7 @@ void reset_cur_panning()
     evas_object_move (active_image, 0, 0);    
 }
 
-void predict_page(int page)
+static void predict_page(int page)
 {
     pthread_mutex_lock(&pdf_renderer_mutex);
     request_page_synch(page);
@@ -435,7 +435,7 @@ void show_cur_page()
     active_image = newimage;
 }
 
-void next_page()
+static void next_page()
 {
     if(curpage>=(numpages-1))
         return;
@@ -444,7 +444,7 @@ void next_page()
     reset_cur_panning();
 }
 
-void prev_page()
+static void prev_page()
 {
     if(curpage<=0)
         return;
