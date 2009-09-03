@@ -1,6 +1,6 @@
 /***************************************************************************
  *   Copyright (C) 2008 by Marc Lajoie                                     *
- *   quickhand@openinkpot.org                                                         *
+ *   quickhand@openinkpot.org                                              *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -57,6 +57,8 @@ pthread_mutex_t pdf_renderer_mutex = PTHREAD_MUTEX_INITIALIZER;
 int numpages;
 int curpage=0;
 int curpdfobj=1;
+static Evas_Object *find_active_pdfobj();
+static Evas_Object *find_inactive_pdfobj();
 int prerendering=0;
 int fitmode=FIT_WIDTH;
 int readermode=0;
@@ -209,15 +211,13 @@ Epdf_Document *get_document()
 }
 void render_cur_page()
 {
-    char pdfobjstr[20];
-    sprintf(pdfobjstr,"pdfobj%d",curpdfobj);
-
     pthread_mutex_lock(&pdf_renderer_mutex);
 
-    Evas_Object *pdfobj=evas_object_name_find(evas,pdfobjstr);
+    Evas_Object *pdfobj = find_active_pdfobj();
     epdf_page_page_set(page,curpage);
     int width,height;
     epdf_page_size_get (page, &width, &height);
+
     double fitwidthzoom=((double)get_win_width())/((double)(width-lefttrim-righttrim))*zoom;
     double fitheightzoom=((double)get_win_height())/((double)(height-toptrim-bottomtrim))*zoom;
     
@@ -268,23 +268,19 @@ void render_cur_page()
     else
     {
         epdf_page_render_slice (page,pdfobj,(int)(((double)lefttrim)*scalex),(int)(((double)toptrim)*scaley),(int)(((double)(width-lefttrim-righttrim))*scalex),(int)(((double)(height-toptrim-bottomtrim))*scaley));
-                             
-        
     }
 
     pthread_mutex_unlock(&pdf_renderer_mutex);
-
-    //fprintf(stderr,"\nwidth=%d,height=%d,ltrim=%d,rtrim=%d,ttrim=%d,btrim=%d,fwzoom=%f,fhzoom=%f\n",width,height,lefttrim,righttrim,toptrim,bottomtrim,fitwidthzoom,fitheightzoom);
 }
 
-Evas_Object *find_active_pdfobj()
+static Evas_Object *find_active_pdfobj()
 {
     if(curpdfobj==1)
         return evas_object_name_find(evas,"pdfobj1");
     else
         return evas_object_name_find(evas,"pdfobj2");
 }
-Evas_Object *find_inactive_pdfobj()
+static Evas_Object *find_inactive_pdfobj()
 {
     if(curpdfobj==1)
         return evas_object_name_find(evas,"pdfobj2");
@@ -432,9 +428,8 @@ void next_page()
     reset_next_panning();
     flip_pages();
     prerender_next_page();
-
-
 }
+
 void prev_page()
 {
     if(curpage<=0)
@@ -716,7 +711,7 @@ int main(int argc, char *argv[])
         restore_global_settings(argv[1]);
     /* create our Ecore_Evas and show it */
     ee = ecore_evas_software_x11_new(0, 0, 0, 0, 600, 800);
-    
+    assert(ee != NULL);
     
     ecore_evas_borderless_set(ee, 0);
     ecore_evas_shaped_set(ee, 0);
@@ -745,8 +740,8 @@ int main(int argc, char *argv[])
     if (!document) {
     // manage error here
         fprintf(stderr,"Error Opening Document");
-
     }
+
     numpages=epdf_document_page_count_get(document);
     page = epdf_page_new (document);
     if (!page) {
@@ -760,19 +755,20 @@ int main(int argc, char *argv[])
     o2 = evas_object_image_add (evas);
     evas_object_move (o2, 0, 0);
     evas_object_name_set(o2, "pdfobj2");
-    //evas_object_show (o2);
 
     o1 = evas_object_image_add (evas);
     
     
-    char *temp11,*temp12;
+    char *temp11 = NULL, *temp12 = NULL;
     if(dbres!=(-1))
     {
         temp11=get_setting(argv[1],"current_x");
         temp12=get_setting(argv[1],"current_y");
     }
-    if(temp11 && temp12 && dbres!=(-1))
-        evas_object_move (o1,(int)strtol(temp11,NULL,10),(int)strtol(temp12,NULL,10));
+    if(temp11 && temp12)
+        evas_object_move(o1,
+			(int)strtol(temp11,NULL,10),
+			(int)strtol(temp12,NULL,10));
     else
         evas_object_move(o1,0,0);
     if(temp11)
