@@ -37,7 +37,6 @@ void goto_page(int newpage);
 int get_cur_page();
 Epdf_Document *get_document();
 
-void render_cur_page();
-void prerender_next_page();
+void show_cur_page();
 void reset_cur_panning();
 #endif

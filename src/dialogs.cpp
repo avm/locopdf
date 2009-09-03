@@ -159,8 +159,7 @@ void lefttrim_entryhandler(Evas *e, Evas_Object *obj,char *value)
         update_label(e,trimmingchoicebox,0,tempo);
         free(tempo);
         free(value);
-        render_cur_page();
-        prerender_next_page();
+        show_cur_page();
     }
     
 }
@@ -185,8 +184,7 @@ void righttrim_entryhandler(Evas *e, Evas_Object *obj,char *value)
         update_label(e,trimmingchoicebox,1,tempo);
         free(tempo);
         free(value);
-        render_cur_page();
-        prerender_next_page();
+        show_cur_page();
     }
 }
 
@@ -210,8 +208,7 @@ void toptrim_entryhandler(Evas *e, Evas_Object *obj,char *value)
         update_label(e,trimmingchoicebox,2,tempo);
         free(tempo);
         free(value);
-        render_cur_page();
-        prerender_next_page();
+        show_cur_page();
     }
 }
 
@@ -235,8 +232,7 @@ void bottomtrim_entryhandler(Evas *e, Evas_Object *obj,char *value)
         update_label(e,trimmingchoicebox,3,tempo);
         free(tempo);
         free(value);
-        render_cur_page();
-        prerender_next_page();
+        show_cur_page();
     }
 }
 
@@ -259,8 +255,7 @@ void fitmode_choicehandler(Evas *e, Evas_Object *parent,int choice, bool lp)
         
         evas_object_focus_set(choicebox_get_parent(e,parent),1);
         fini_choicebox(e,parent,false);
-        render_cur_page();
-        prerender_next_page();
+        show_cur_page();
     }
 }
 
@@ -399,8 +394,7 @@ void preferences_choicehandler(Evas *e, Evas_Object *parent,int choice, bool lp)
     {
         set_antialias_mode(!get_antialias_mode());
         update_label(e,preferenceschoicebox,5,OFF_ON_STRINGS[get_antialias_mode()]);
-        render_cur_page();
-        prerender_next_page();
+        show_cur_page();
     }
     else if(choice==6)
     {
