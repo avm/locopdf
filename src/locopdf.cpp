@@ -219,6 +219,7 @@ static struct cache_item {
 
 /* prediction for the next page. */
 static int prediction = INVALID_PAGE;
+static int cache_invalidated = 0;
 
 static cache_item *find_unused_obj()
 {
@@ -233,13 +234,22 @@ static cache_item *find_unused_obj()
 }
 
 static void render_page(int page, Evas_Object *obj);
+static void image_cache_clear();
 
 static void *thread_func(void *vptr_args)
 {
+    pthread_mutex_lock(&pdf_renderer_mutex);
+
     while(1) {
-        pthread_mutex_lock(&pdf_renderer_mutex);
-        while(prediction == INVALID_PAGE)
+        while(prediction == INVALID_PAGE && !cache_invalidated)
             pthread_cond_wait(&pdf_page_event, &pdf_renderer_mutex);
+
+        if(cache_invalidated) {
+            image_cache_clear();
+            cache_invalidated = 0;
+            continue;
+        }
+
         // Right now prediction is valid and the page_event has fired.
         // Looks like we have to render the page
         fprintf(stderr, "gonna render %d\n", prediction);
@@ -255,12 +265,15 @@ static void *thread_func(void *vptr_args)
         render_page(page, item->obj);
 
         pthread_mutex_lock(&pdf_renderer_mutex);
-        item->page = page;
-        if(prediction == page)
-            prediction = INVALID_PAGE;
-        pthread_cond_signal(&pdf_page_event);
-        pthread_mutex_unlock(&pdf_renderer_mutex);
+        if(!cache_invalidated) { // maybe even this page is dirty.
+            item->page = page;
+            if(prediction == page)
+                prediction = INVALID_PAGE;
+            pthread_cond_signal(&pdf_page_event);
+        }
     }
+
+    pthread_mutex_unlock(&pdf_renderer_mutex);
 }
 
 static void undisplay_image(Evas_Object *image)
@@ -277,6 +290,9 @@ static void undisplay_image(Evas_Object *image)
 
 static cache_item *try_find_slot_synch(int page)
 {
+    if(cache_invalidated)
+        return NULL;
+
     for(int i = 0; i < cache_size; i++) {
         if(cache[i].page == page)
             return &cache[i];
@@ -370,6 +386,15 @@ static void image_cache_init()
         item->displayed = 0;
         item->obj = evas_object_image_add(evas);
         evas_object_move(item->obj, 0, 0);
+    }
+}
+
+static void image_cache_clear()
+{
+    for(int i = 0; i < cache_size; i++) {
+        cache_item *item = cache + i;
+        item->page = INVALID_PAGE;
+        item->displayed = 0;
     }
 }
 
