@@ -431,6 +431,8 @@ void reset_cur_panning()
 
 static void predict_page(int page)
 {
+    if(page < 0 || page >= numpages)
+        return;
     pthread_mutex_lock(&pdf_renderer_mutex);
     request_page_synch(page);
     pthread_mutex_unlock(&pdf_renderer_mutex);
