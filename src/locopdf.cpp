@@ -499,35 +499,33 @@ void main_ok(Evas *e, Evas_Object *obj)
     
 }
 
-void main_plus(Evas *e, Evas_Object *obj)
+static void set_zoom(double new_zoom)
 {
-    Evas_Object *pdfobj = active_image;
+    fprintf(stderr, "trying to set zoom: %lf\n", new_zoom);
+    if(new_zoom < 0)
+        return;
+
     int x,y,w,h;
-    evas_object_geometry_get(pdfobj,&x,&y,&w,&h);
-    int new_w=ROUND(((double)w)*(zoom+zoominc)/zoom);
-    int new_h=ROUND(((double)h)*(zoom+zoominc)/zoom);
+    evas_object_geometry_get(active_image,&x,&y,&w,&h);
+    int new_w=ROUND(((double)w)*(new_zoom)/zoom);
+    int new_h=ROUND(((double)h)*(new_zoom)/zoom);
     if(are_legal_coords(x,y,x+new_w,y+new_h))
     {
-        zoom+=zoominc;
+        zoom = new_zoom;
+        invalidate_cache();
         show_cur_page();
     }
 }
+
+void main_plus(Evas *e, Evas_Object *obj)
+{
+    set_zoom(zoom + zoominc);
+}
 void main_minus(Evas *e, Evas_Object *obj)
 {
-    if((zoom-zoominc)>0)
-    {
-        Evas_Object *pdfobj = active_image;
-        int x,y,w,h;
-        evas_object_geometry_get(pdfobj,&x,&y,&w,&h);
-        int new_w=ROUND(((double)w)*(zoom-zoominc)/zoom);
-        int new_h=ROUND(((double)h)*(zoom-zoominc)/zoom);
-        if(are_legal_coords(x,y,x+new_w,y+new_h))
-        {
-            zoom-=zoominc;
-            show_cur_page();
-        }
-    }
+    set_zoom(zoom - zoominc);
 }
+
 void main_nav_up(Evas *e, Evas_Object *obj)
 {
     
@@ -540,7 +538,6 @@ void main_nav_down(Evas *e, Evas_Object *obj)
 
 void main_nav_left(Evas *e, Evas_Object *obj)
 {
-    
     prev_page();
 }
 
