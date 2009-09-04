@@ -221,6 +221,13 @@ static struct cache_item {
 static int prediction = INVALID_PAGE;
 static int cache_invalidated = 0;
 
+static void invalidate_cache()
+{
+    pthread_mutex_lock(&pdf_renderer_mutex);
+    cache_invalidated = 1;
+    pthread_mutex_unlock(&pdf_renderer_mutex);
+}
+
 static cache_item *find_unused_obj()
 {
     struct cache_item *item = cache;
@@ -234,7 +241,7 @@ static cache_item *find_unused_obj()
 }
 
 static void render_page(int page, Evas_Object *obj);
-static void image_cache_clear();
+static void image_cache_clear_synch();
 
 static void *thread_func(void *vptr_args)
 {
@@ -245,7 +252,7 @@ static void *thread_func(void *vptr_args)
             pthread_cond_wait(&pdf_page_event, &pdf_renderer_mutex);
 
         if(cache_invalidated) {
-            image_cache_clear();
+            image_cache_clear_synch();
             cache_invalidated = 0;
             continue;
         }
@@ -389,12 +396,10 @@ static void image_cache_init()
     }
 }
 
-static void image_cache_clear()
+static void image_cache_clear_synch()
 {
     for(int i = 0; i < cache_size; i++) {
-        cache_item *item = cache + i;
-        item->page = INVALID_PAGE;
-        item->displayed = 0;
+        cache[i].page = INVALID_PAGE;
     }
 }
 
