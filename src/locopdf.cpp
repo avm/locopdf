@@ -818,8 +818,12 @@ int main(int argc, char *argv[])
 
     /* start the main event loop */
     ecore_main_loop_begin();
+
+    /* the main loop has exited, initiate shutdown: */
+    /* stop worker thread */
+    pthread_cancel(thread);
     
-    /* when the main event loop exits, shutdown our libraries */
+    /* shutdown libraries */
     if(dbres!=(-1))
     {
         save_global_settings(argv[1]);
@@ -831,6 +835,9 @@ int main(int argc, char *argv[])
         set_setting_INT(argv[1],"antialias",get_antialias_mode());
         fini_database();
     }
+
+    /* after ensuring that the worker is dead, start freeing objects */
+    pthread_join(thread, NULL);
     evas_object_del (bg);
     epdf_index_delete(pdf_index);
     epdf_page_delete (page);
