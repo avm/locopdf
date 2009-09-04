@@ -112,16 +112,14 @@ Evas_Object *init_entrybox(Evas *evas,const char* title,const char *defaultentry
 
 	entry_info_struct *info =
 		(entry_info_struct *) malloc(sizeof(entry_info_struct));
-    int usedefault=1;
-    if(strlen(defaultentry)>maxlength)
-        usedefault=0;
     
     info->entry=(char*)malloc(sizeof(char)*(maxlength+1));
     (info->entry)[0]='\0';
-	if(usedefault)
+
+    if(strlen(defaultentry) <= maxlength)
     {
         info->curchar = strlen(defaultentry);
-        strcat(info->entry,defaultentry);
+        strcpy(info->entry,defaultentry);
     }
     else
         info->curchar = 0;
