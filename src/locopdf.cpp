@@ -258,7 +258,7 @@ static void *thread_func(void *vptr_args)
         assert(item != NULL);
 
         int page = prediction;
-        item->page = 0;
+        item->page = INVALID_PAGE;
         pthread_mutex_unlock(&pdf_renderer_mutex);
 
         // Rendering takes place out of the mutex.
