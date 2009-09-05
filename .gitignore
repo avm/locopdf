@@ -1,3 +1,4 @@
+Makefile
 Makefile.in
 config.log
 config.sub
@@ -15,5 +16,6 @@ depcomp
 install-sh
 INSTALL
 src/*.o
+src/.deps
 src/locopdf
 stamp-h1
