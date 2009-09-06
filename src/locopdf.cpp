@@ -459,11 +459,11 @@ void show_cur_page()
     // FIXME: where do we check that curpage+1 exists?
     predict_page(curpage + 1);
 
+    evas_object_show(newimage);
     if(active_image) {
         evas_object_hide(active_image);
         undisplay_image(active_image);
     }
-    evas_object_show(newimage);
     active_image = newimage;
 }
 
