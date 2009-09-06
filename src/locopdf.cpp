@@ -403,9 +403,9 @@ static void image_cache_clear_synch()
     }
 }
 
-int are_legal_coords(int x1,int y1,int x2,int y2)
+static int is_legal_rect(int x1, int y1, int width, int height)
 {
-    
+    int x2 = x1 + width, y2 = y1 + height;
     int xs_in_range=((x1>0&&x1<get_win_width())||(x2>0&&x2<get_win_width()));
     int ys_in_range=((y1>0&&y1<get_win_height())||(y2>0&&y2<get_win_height()));
     int xs_opposite=(x1<=0&&x2>=get_win_width());
@@ -418,8 +418,8 @@ static void pan_cur_page(int panx,int pany)
     int x,y,w,h;
     evas_object_geometry_get(active_image,&x,&y,&w,&h);
     
-    if(are_legal_coords(x+panx,y+pany,x+w+panx,y+h+pany))
-        evas_object_move (active_image,x+panx,y+pany);
+    if(is_legal_rect(x + panx, y + pany, w, h))
+        evas_object_move (active_image, x + panx, y + pany);
 }
 
 void reset_cur_panning()
@@ -509,7 +509,7 @@ static void set_zoom(double new_zoom)
     evas_object_geometry_get(active_image,&x,&y,&w,&h);
     int new_w=ROUND(((double)w)*(new_zoom)/zoom);
     int new_h=ROUND(((double)h)*(new_zoom)/zoom);
-    if(are_legal_coords(x,y,x+new_w,y+new_h))
+    if(is_legal_rect(x, y, new_w, new_h))
     {
         zoom = new_zoom;
         invalidate_cache();
@@ -551,7 +551,7 @@ void main_nav_right(Evas *e, Evas_Object *obj)
         evas_object_geometry_get(pdfobj,&x,&y,&w,&h);
     
     
-        if(are_legal_coords(x,y+pan_amt,x+w,y+h+pan_amt))
+        if(is_legal_rect(x, y+pan_amt, w, h))
             pan_cur_page(0,pan_amt);
         else
             next_page();
@@ -622,7 +622,7 @@ void main_item(Evas *e, Evas_Object *obj,int index, bool lp)
             evas_object_geometry_get(pdfobj,&x,&y,&w,&h);
     
     
-            if(are_legal_coords(x,y+pan_amt,x+w,y+h+pan_amt))
+            if(is_legal_rect(x, y+pan_amt, w, h))
                 pan_cur_page(0,pan_amt);
             else
                 next_page();
