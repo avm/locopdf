@@ -410,9 +410,7 @@ int are_legal_coords(int x1,int y1,int x2,int y2)
     int ys_in_range=((y1>0&&y1<get_win_height())||(y2>0&&y2<get_win_height()));
     int xs_opposite=(x1<=0&&x2>=get_win_width());
     int ys_opposite=(y1<=0&&y2>=get_win_height());
-    if((ys_in_range && xs_in_range) || (ys_in_range&& xs_opposite) || (xs_in_range && ys_opposite) || (xs_opposite && ys_opposite))
-        return 1;
-    return 0;
+    return ((ys_in_range || ys_opposite) && (xs_in_range || xs_opposite));
 }
 
 static void pan_cur_page(int panx,int pany)
