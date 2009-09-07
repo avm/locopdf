@@ -720,6 +720,20 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
+    if (!strcmp(argv[1], "-geometry") && argv[2] && argv[2][0]) {
+        int w = 0, h = 0;
+        char *endptr;
+        w = strtol(argv[2], &endptr, 10);
+        if(*endptr)
+            h = strtol(endptr + 1, NULL, 10);
+        if(w)
+            winwidth = w;
+        if(h)
+            winheight = h;
+        argv += 2;
+        argc -= 2;
+    }
+
     /* initialize our libraries */
     evas_init();
     ecore_init();
@@ -747,7 +761,7 @@ int main(int argc, char *argv[])
     if(dbres!=(-1))
         restore_global_settings(argv[1]);
     /* create our Ecore_Evas and show it */
-    ee = ecore_evas_software_x11_new(0, 0, 0, 0, 600, 800);
+    ee = ecore_evas_software_x11_new(0, 0, 0, 0, winwidth, winheight);
     assert(ee != NULL);
     
     ecore_evas_borderless_set(ee, 0);
@@ -762,7 +776,7 @@ int main(int argc, char *argv[])
     bg = evas_object_rectangle_add(evas);
     evas_object_color_set(bg, 255, 255, 255, 255);
     evas_object_move(bg, 0, 0);
-    evas_object_resize(bg, 600, 800);
+    evas_object_resize(bg, winwidth, winheight);
     evas_object_name_set(bg, "background");
     evas_object_focus_set(bg, 1);
     set_key_handler(bg,&main_info);
