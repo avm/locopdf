@@ -38,6 +38,8 @@
 #include "dialogs.h"
 #include "locopdf.h"
 #include "database.h"
+#include "point.h"
+
 #define REL_THEME "themes/themes_oitheme.edj"
 
 #define ROUND(f) (int)floor(f + 0.5)
@@ -507,13 +509,26 @@ static void set_zoom(double new_zoom)
 
     int x,y,w,h;
     evas_object_geometry_get(active_image,&x,&y,&w,&h);
-    int new_w=ROUND(((double)w)*(new_zoom)/zoom);
-    int new_h=ROUND(((double)h)*(new_zoom)/zoom);
-    if(is_legal_rect(x, y, new_w, new_h))
+
+    // We'll try to keep the center of the screen in place:
+    PointD corner(get_win_width(), get_win_height());
+    PointD fixpoint = corner / 2;
+    // To keep immobile the upper left corner, we would do this:
+    // fixpoint = PointD(0, 0);
+
+    PointD pos(x, y);
+    PointD new_pos = fixpoint + (pos - fixpoint) * new_zoom / zoom;
+
+    PointD extent = PointD(w, h) * new_zoom / zoom;
+
+    if(is_legal_rect(new_pos.x, new_pos.y, extent.x, extent.y))
     {
         zoom = new_zoom;
         invalidate_cache();
         show_cur_page();
+
+        reset_cur_panning();
+        pan_cur_page(new_pos.x, new_pos.y);
     }
 }
 
